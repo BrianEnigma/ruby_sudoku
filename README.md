@@ -5,3 +5,10 @@ This little Ruby script will scrape the New York Times and USA Today sites for t
 The resulting PDF contains the two puzzles, each in a 3" x 5" square, so it can be folded up into a double-sided square that is suitable for your Hipster PDA, Field Notes, or Moleskine Cahier.
 
 This script is suitable for wrapping up in a daily cron job.
+
+#Prerequisites
+
+For PDF generation, you should install the prawn gem:
+
+    sudo gem install prawn
+
