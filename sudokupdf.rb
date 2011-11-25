@@ -9,17 +9,17 @@ require 'sudoku.rb'
 
 Prawn.debug = false
 
-INCHES_3p5 = 252
+INCHES_3 = 216
 INCHES_5 = 360
 
 grid = [".", ".", ".", ".", "2", ".", ".", ".", ".", ".", "3", "8", ".", "1", "5", "6", ".", ".", ".", ".", "5", ".", "6", "3", ".", "7", ".", ".", ".", ".", ".", "8", ".", ".", "3", "4", "1", ".", ".", ".", ".", ".", ".", ".", "2", "5", "8", ".", ".", "4", ".", ".", ".", ".", ".", "2", ".", "1", "7", ".", "4", ".", ".", ".", ".", "9", "2", "3", ".", "7", "8", ".", ".", ".", ".", ".", "9", ".", ".", ".", "."]
 
 def draw_card(pdf, card_number, x, y, title, date, grid)
-    grid_width = INCHES_3p5 - 10
+    grid_width = INCHES_3 - 10
     # Outer rectangle
     pdf.fill_color = '000000'
     pdf.stroke_color = '000000'
-    pdf.rectangle([x, pdf.bounds.height - y], INCHES_3p5, INCHES_5)
+    pdf.rectangle([x, pdf.bounds.height - y], INCHES_3, INCHES_5)
     pdf.line_width(0.25)
     pdf.stroke
     # Title
@@ -88,6 +88,6 @@ date_label = ''
 grid = s.parse_data(SudokuLoader::NYT, "./cache/", date_label)
 #print("New York Times, #{date_label}:\n")
 #print(SudokuLoader::grid_to_string(grid))
-draw_card(pdf, 2, INCHES_3p5, 0, "New York Times", date_label, grid)
+draw_card(pdf, 2, INCHES_3, 0, "New York Times", date_label, grid)
 
 pdf.render_file("./results/sudoku-#{Time.new.strftime('%Y%m%d')}.pdf")
