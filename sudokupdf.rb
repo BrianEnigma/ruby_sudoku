@@ -12,9 +12,7 @@ Prawn.debug = false
 INCHES_3 = 216
 INCHES_5 = 360
 
-grid = [".", ".", ".", ".", "2", ".", ".", ".", ".", ".", "3", "8", ".", "1", "5", "6", ".", ".", ".", ".", "5", ".", "6", "3", ".", "7", ".", ".", ".", ".", ".", "8", ".", ".", "3", "4", "1", ".", ".", ".", ".", ".", ".", ".", "2", "5", "8", ".", ".", "4", ".", ".", ".", ".", ".", "2", ".", "1", "7", ".", "4", ".", ".", ".", ".", "9", "2", "3", ".", "7", "8", ".", ".", ".", ".", ".", "9", ".", ".", ".", "."]
-
-def draw_card(pdf, card_number, x, y, title, date, grid)
+def draw_card(pdf, card_number, x, y, puzzle)
     grid_width = INCHES_3 - 10
     # Outer rectangle
     pdf.fill_color = '000000'
@@ -24,14 +22,14 @@ def draw_card(pdf, card_number, x, y, title, date, grid)
     pdf.stroke
     # Title
     pdf.font "Helvetica"
-    pdf.text_box("Sudoku, #{title}", {:kerning => true, :size => 12, :at => [x + 5, pdf.bounds.height - y - 5]})
+    pdf.text_box("Sudoku, #{puzzle.title}", {:kerning => true, :size => 12, :at => [x + 5, pdf.bounds.height - y - 5]})
     # Divider and date
     pdf.rectangle([x + 5, pdf.bounds.height - y - 20], grid_width, 10)
     pdf.fill
     pdf.font "Helvetica-Bold"
     pdf.fill_color = 'FFFFFF'
     pdf.stroke_color = 'FFFFFF'
-    pdf.text_box("#{date}", {:kerning => true, :size => 8, :at => [x + 5 + 3, pdf.bounds.height - y - 20 - 2]})
+    pdf.text_box("#{puzzle.date_label}", {:kerning => true, :size => 8, :at => [x + 5 + 3, pdf.bounds.height - y - 20 - 2]})
     pdf.font "Helvetica"
     pdf.fill_color = 'FFFFFF'
     pdf.stroke_color = '000000'
@@ -57,20 +55,17 @@ def draw_card(pdf, card_number, x, y, title, date, grid)
     pdf.stroke_color = '000000'
     grid_x = x + 5
     grid_y = pdf.bounds.height - y - 35
-    if grid.length != 81
+    if puzzle.grid.length != 81
         pdf.text_box("Invalid data", {:size =>12, :at => [grid_x, grid_y - grid_width - 2]})
     else
         (0...81).each { |i|
             xpos = grid_x + (i % 9) * (grid_width.to_f / 9)
             ypos = grid_y - (i / 9) * (grid_width.to_f / 9)
-            if grid[i] != '.'
-                pdf.text_box(grid[i], {:size =>24, :at => [xpos, ypos - 2], :width => grid_width.to_f / 9, :height => grid_width.to_f / 9, :align => :center, :valign => :center})
+            if puzzle.grid[i] != '.'
+                pdf.text_box(puzzle.grid[i], {:size =>24, :at => [xpos, ypos - 2], :width => grid_width.to_f / 9, :height => grid_width.to_f / 9, :align => :center, :valign => :center})
             end
         }
     end
-    
-    
-    
 end
 
 pdf = Prawn::Document.new()
@@ -78,16 +73,12 @@ s = SudokuLoader.new()
 
 s.update_data(SudokuLoader::USA, "./cache/")
 date_label = ''
-grid = s.parse_data(SudokuLoader::USA, "./cache/", date_label)
-#print("USA Today, #{date_label}:\n")
-#print(SudokuLoader::grid_to_string(grid))
-draw_card(pdf, 1, 0, 0, "USA Today", date_label, grid)
+puzzle = s.parse_data(SudokuLoader::USA, "./cache/")
+draw_card(pdf, 1, 0, 0, puzzle)
 
 s.update_data(SudokuLoader::NYT, "./cache/")
 date_label = ''
-grid = s.parse_data(SudokuLoader::NYT, "./cache/", date_label)
-#print("New York Times, #{date_label}:\n")
-#print(SudokuLoader::grid_to_string(grid))
-draw_card(pdf, 2, INCHES_3, 0, "New York Times", date_label, grid)
+puzzle = s.parse_data(SudokuLoader::NYT, "./cache/")
+draw_card(pdf, 2, INCHES_3, 0, puzzle)
 
 pdf.render_file("./results/sudoku-#{Time.new.strftime('%Y%m%d')}.pdf")

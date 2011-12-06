@@ -3,6 +3,16 @@
 require 'net/http'
 require 'uri'
 
+class SudokuPuzzle
+  attr_accessor :grid, :title, :date_label, :difficulty
+  def initialize()
+    @grid = Array.new
+    @title = ''
+    @date_label = ''
+    @difficulty = 0
+  end
+end
+
 class SudokuLoader
   NYT = 1
   USA = 2
@@ -96,7 +106,8 @@ class SudokuLoader
     end
   end
 
-  def parse_data(source, cache_folder, date_label)
+  def parse_data(source, cache_folder)
+    result = SudokuPuzzle.new
     if (cache_folder.rindex('/') != cache_folder.length - 1)
       cache_folder += '/'
     end
@@ -112,42 +123,47 @@ class SudokuLoader
     end
     data = File.new(filename, "r").read()
     if (NYT == source)
+      result.title = "New York Times"
+      result.difficulty = 5
       pos1 = data.index('<LABEL>')
       pos2 = data.index('</LABEL>')
-      return false if (nil == pos1 || nil == pos2)
-      date_label << data[(pos1 + 7)...(pos2)]
+      return nil if (nil == pos1 || nil == pos2)
+      result.date_label << data[(pos1 + 7)...(pos2)]
       pos1 = data.index('<STARTGRID>')
       pos2 = data.index('</STARTGRID>')
-      return false if (nil == pos1 || nil == pos2)
+      return nil if (nil == pos1 || nil == pos2)
       data = data[(pos1 + 11)...pos2]
       pos1 = data.index('</COLUMNS>')
       data = data[pos1...data.length]
     elsif (USA == source)
+      result.title = "USA Today"
+      pos1 = data.index('<Difficulty v=')
+      return nil if nil == pos1
+      result.difficulty = data[(pos1 + 15)...(pos1 + 16)].to_i
       pos1 = data.index('<Date v=')
-      return false if nil == pos1
+      return nil if nil == pos1
       compact_date = data[(pos1 + 9)...(pos1 + 15)]
       date = Time.local(compact_date[0..1].to_i + 2000, compact_date[2..3].to_i, compact_date[4..5].to_i, 0, 0, 0, 0)
-      date_label << date.strftime("%A, %B %-d, %Y")
+      result.date_label << date.strftime("%A, %B %-d, %Y")
       pos1 = data.index('<layout>')
       pos2 = data.index('</layout>')
-      return false if (nil == pos1 || nil == pos2)
+      return nil if (nil == pos1 || nil == pos2)
       data = data[(pos1 + 8)...pos2]
       data.gsub!(/<l[1-9]/, '')
     end
     print("#{data}\n") if true == @debug
-    grid_numbers = Array.new
     data.each_byte { |b|
       if b >= "0"[0] && b <= "9"[0]
-        grid_numbers << b.chr
+        result.grid << b.chr
       elsif NYT == source && b == "."[0] # blank space is dot
-        grid_numbers << '.'
+        result.grid << '.'
       elsif USA == source && b == "-"[0] # blank space is dash
-        grid_numbers << '.'
+        result.grid << '.'
       end
     }
-    throw "Grid too small (#{grid_numbers.length})" if grid_numbers.length < 81
-    throw "Grid too big (#{grid_numbers.length})" if grid_numbers.length > 81
-    return grid_numbers
+    throw "Grid too small (#{result.grid.length})" if result.grid.length < 81
+    throw "Grid too big (#{result.grid.length})" if result.grid.length > 81
+    return result
   end
   
   def self.grid_to_string(grid)
