@@ -11,8 +11,13 @@ Prawn.debug = false
 
 INCHES_3 = 216
 INCHES_5 = 360
+CLOSED_STAR = "\xE2\x98\x85"
+OPEN_STAR = "\xE2\x98\x86"
 
 def draw_card(pdf, card_number, x, y, puzzle)
+    stars = ''
+    puzzle.difficulty.times { stars = stars + CLOSED_STAR }
+    (5 - puzzle.difficulty).times { stars = stars + OPEN_STAR }
     grid_width = INCHES_3 - 10
     # Outer rectangle
     pdf.fill_color = '000000'
@@ -21,15 +26,16 @@ def draw_card(pdf, card_number, x, y, puzzle)
     pdf.line_width(0.25)
     pdf.stroke
     # Title
-    pdf.font "Helvetica"
+    pdf.font "DejaVuSans.ttf"
     pdf.text_box("Sudoku, #{puzzle.title}", {:kerning => true, :size => 12, :at => [x + 5, pdf.bounds.height - y - 5]})
     # Divider and date
     pdf.rectangle([x + 5, pdf.bounds.height - y - 20], grid_width, 10)
     pdf.fill
-    pdf.font "Helvetica-Bold"
+    pdf.font "DejaVuSans-Bold.ttf"
     pdf.fill_color = 'FFFFFF'
     pdf.stroke_color = 'FFFFFF'
     pdf.text_box("#{puzzle.date_label}", {:kerning => true, :size => 8, :at => [x + 5 + 3, pdf.bounds.height - y - 20 - 2]})
+    pdf.text_box("#{stars}", {:kerning => true, :size => 8, :at => [x + 5 + grid_width - 37, pdf.bounds.height - y - 20 - 2]})
     pdf.font "Helvetica"
     pdf.fill_color = 'FFFFFF'
     pdf.stroke_color = '000000'
