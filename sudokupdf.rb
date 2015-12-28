@@ -2,10 +2,10 @@
 require 'rubygems'
 require 'prawn'
 require 'prawn/security'
-require "prawn/layout"
+#require "prawn/layout"
 require "prawn/graphics"
 require "prawn/graphics/transformation"
-require 'sudoku.rb'
+require './sudoku.rb'
 
 Prawn.debug = false
 
@@ -77,14 +77,15 @@ end
 pdf = Prawn::Document.new()
 s = SudokuLoader.new()
 
-s.update_data(SudokuLoader::USA, "./cache/")
+s.update_data(:USA, "./cache/")
 date_label = ''
-puzzle = s.parse_data(SudokuLoader::USA, "./cache/")
+puzzle = s.parse_data(:USA, "./cache/")
 draw_card(pdf, 1, 0, 0, puzzle)
 
-s.update_data(SudokuLoader::NYT, "./cache/")
+s.update_data(:NYTnew, "./cache/")
 date_label = ''
-puzzle = s.parse_data(SudokuLoader::NYT, "./cache/")
+puzzle = s.parse_data(:NYTnew, "./cache/")
 draw_card(pdf, 2, INCHES_3, 0, puzzle)
 
 pdf.render_file("./results/sudoku-#{Time.new.strftime('%Y%m%d')}.pdf")
+
