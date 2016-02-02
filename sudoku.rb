@@ -55,7 +55,7 @@ class SudokuLoader
       print("Redirecting to #{res['location']}\n") if true == @debug
       return save_url(res['location'], file, redirect - 1)
     end
-    print("Request result was #{result} #{res.code}\n")
+    print("Request result was #{result} #{res.code}\n") if true == @debug
     return result
   end
   private :save_url
